@@ -127,6 +127,7 @@ const PayInvoicePage: NextPage<{ invoice: Invoice; error: Error }> = ({
     </PayLayout>
   );
 };
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { stripe } = await import("utils/stripe");
   return stripe.invoices
