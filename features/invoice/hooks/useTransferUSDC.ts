@@ -22,7 +22,7 @@ export function useTransferUSDC(to: string, amount: string) {
     contractInterface: erc20ABI,
     functionName: "transfer",
     enabled: Boolean(to && data),
-    args: [to, ethers.utils.parseUnits("10", data?.decimals)],
+    args: [to, ethers.utils.parseUnits(amount, data?.decimals)],
   });
   const transfer = useContractWrite(tx.config);
   console.log("tranfeer", transfer.data);
