@@ -1,13 +1,24 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from "next";
 
 type Data = {
-  name: string
-}
+  name: string;
+};
+
+const serverURL = `http://localhost:3000`;
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  res.status(200).json({ name: 'John Doe' })
+  const { address, invoice } = req.body;
+
+  const sdk = require("api")("@alchemy-docs/v1.0#1q84j11l6middf5");
+  return sdk
+    .createWebhook({
+      addresses: [address],
+      network: "ETH_GOERLI",
+      webhook_type: "ADDRESS_ACTIVITY",
+      webhook_url: `${serverURL}/webhooks/alchemy?invoice=${invoice}`,
+    })
+    .then((r) => res.status(201).json(r));
 }
