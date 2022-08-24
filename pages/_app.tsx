@@ -1,7 +1,5 @@
 import type { AppProps } from "next/app";
 import { withTRPC } from "@trpc/next";
-import { AppRouter } from "./api/trpc/[trpc]";
-
 import "@rainbow-me/rainbowkit/styles.css";
 
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
@@ -9,6 +7,9 @@ import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
+
+import { AppRouter } from "./api/trpc/[trpc]";
+import { getToken } from "utils/localStorage";
 
 const { chains, provider } = configureChains(
   [chain.mainnet, chain.goerli],
@@ -67,6 +68,12 @@ export default withTRPC<AppRouter>({
      */
     return {
       url: `${getBaseUrl()}/api/trpc`,
+      headers() {
+        const token = getToken();
+        return {
+          Authorization: token ? `Bearer ${token}` : null,
+        };
+      },
       /**
        * @link https://react-query-v3.tanstack.com/reference/QueryClient
        */

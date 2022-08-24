@@ -11,7 +11,8 @@ import {
 export function useTransferUSDC(to: string, amount: string) {
   const { chain } = useNetwork();
   const address = config[chain?.id as 1 | 5]?.tokens.usdc;
-
+  console.log(amount);
+  console.log(ethers.utils.parseUnits(amount, data?.decimals), data?.decimals);
   const { data } = useToken({
     address,
     enabled: Boolean(chain?.id && address),

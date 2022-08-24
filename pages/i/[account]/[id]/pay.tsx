@@ -26,25 +26,19 @@ import { trpc } from "utils/trpc";
 import { useRouter } from "next/router";
 
 const emptyInvoice = {} as Invoice;
-const PayInvoicePage: NextPage = (
-  {
-    // invoice = emptyInvoice,
-    // error,
-  }
-) => {
+const PayInvoicePage: NextPage = () => {
   const router = useRouter();
-  const account = useAccount();
-
+  const { address } = useAccount();
+  const { id, account } = router.query as { id: string; account: string };
   const {
-    data: invoice,
+    data: invoice = {},
     error,
     isLoading,
-  } = trpc.useQuery([
-    "invoices.byId",
-    { id: router.query.id as string, stripeAccount: "acct_1LaBDLKoFCylMjm8" },
-  ]);
+  } = trpc.useQuery(["invoices.byId", { id, account }]);
+  const walletAddress = trpc.useQuery(["account.wallet", { account }]);
   console.log(invoice);
-  const address = getAddress(invoice.footer);
+  console.log(walletAddress.data);
+  const wallet = getAddress(invoice?.footer) || walletAddress.data?.wallet;
   const { chain } = useNetwork();
   const isTest = true || chain?.id !== 1;
   const isCorrectChain =
@@ -68,7 +62,7 @@ const PayInvoicePage: NextPage = (
       </HStack>
       <InvoiceDetails invoice={invoice} />
       <NoSSR>
-        {!account.address ? (
+        {!address ? (
           <Alert
             status="info"
             variant="subtle"
@@ -116,7 +110,7 @@ const PayInvoicePage: NextPage = (
             </AlertDescription>
           </Alert>
         ) : isCorrectChain ? (
-          <PayInvoice address={address} amount={invoice.total / 100} />
+          <PayInvoice address={wallet} amount={invoice.total / 100} />
         ) : (
           <SwitchNetwork />
         )}
@@ -135,17 +129,5 @@ const PayInvoicePage: NextPage = (
     </PayLayout>
   );
 };
-// export const getServerSideProps: GetServerSideProps = async (ctx) => {
-//   const { stripe } = await import("utils/stripe");
-//   return stripe.invoices
-//     .retrieve(ctx.query.id as string)
-//     .then((invoice) => ({ props: { invoice } }))
-//     .catch((err) => {
-//       const { message, statusCode = 500 } = err;
-//       return {
-//         props: { error: { message, statusCode } },
-//       };
-//     });
-// };
 
 export default PayInvoicePage;
