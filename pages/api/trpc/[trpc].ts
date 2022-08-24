@@ -54,8 +54,11 @@ export const appRouter = trpc
   })
   .query("invoices.list", {
     input: z.any(),
-    async resolve({ input }) {
-      return stripe.invoices.list();
+    async resolve({ input, ctx }) {
+      if (ctx.user) {
+        return stripe.invoices.list({ stripeAccount: ctx.user.stripe_user_id });
+      }
+      return null;
     },
   })
   .query("invoices.byId", {

@@ -1,81 +1,20 @@
 import {
+  chakra,
   Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
+  Image,
   Input,
+  Stack,
+  Text,
+  HStack,
+  Flex,
 } from "@chakra-ui/react";
-import Layout, { useStripe } from "components/Layout";
+import USDC from "components/USDC";
 import ConnectStripe from "features/dashboard/components/ConnectStripe";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { EthAddress } from "schemas";
+import { useEffect } from "react";
 import { signJwt } from "utils/jwt";
 import { setToken } from "utils/localStorage";
-import { trpc } from "utils/trpc";
-import Card from "components/Card";
-
-function AddressForm({ address = "" }) {
-  const wallet = trpc.useMutation("customer.wallet");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(z.object({ address: EthAddress })),
-    defaultValues: { address },
-  });
-
-  const error = errors.address;
-  return (
-    <form
-      onSubmit={handleSubmit(({ address }) => {
-        console.log(address);
-        wallet.mutate({ address });
-      })}
-    >
-      <FormControl isInvalid={!!error} mb={2}>
-        <FormLabel htmlFor="address">Wallet Address</FormLabel>
-        <Input required id="address" {...register("address")} />
-        <FormErrorMessage>{error?.message}</FormErrorMessage>
-      </FormControl>
-      <Button
-        type="submit"
-        colorScheme={"blue"}
-        isLoading={wallet.isLoading}
-        disabled={wallet.isLoading}
-      >
-        Save
-      </Button>
-    </form>
-  );
-}
-function Dashboard() {
-  const { data, isLoading, error, ...rest } = trpc.useQuery(["customer.me"]);
-
-  console.log("Dashboard", data, rest);
-  return (
-    <Box>
-      <Heading>{data?.account?.settings?.dashboard.display_name}</Heading>
-      <Card>
-        {data && !isLoading ? <AddressForm address={data?.wallet} /> : null}
-      </Card>
-      <ConnectStripe />
-    </Box>
-  );
-}
 
 const Home: NextPage<{ token: string }> = ({ token, ...props }) => {
   console.log(props);
@@ -83,13 +22,104 @@ const Home: NextPage<{ token: string }> = ({ token, ...props }) => {
   useEffect(() => {
     if (token) {
       setToken(token);
-      router.push("/");
+      router.push("/dashboard");
     }
   }, []);
   return (
-    <Layout>
-      <Dashboard />
-    </Layout>
+    <Box px={8} py={24} mx="auto">
+      <Box
+        w={{
+          base: "full",
+          md: 11 / 12,
+          xl: 9 / 12,
+        }}
+        mx="auto"
+        textAlign={{
+          base: "left",
+          md: "center",
+        }}
+      >
+        <chakra.h1
+          mb={6}
+          fontSize="6xl"
+          // fontSize={{
+          //   base: "4xl",
+          //   md: "6xl",
+          // }}
+          fontWeight="bold"
+          lineHeight="none"
+          // letterSpacing={{
+          //   base: "normal",
+          //   md: "tight",
+          // }}
+          color="gray.900"
+          // _dark={{
+          //   color: "gray.100",
+          // }}
+        >
+          Receive payments for your
+          <Text
+            // display={{
+            //   base: "block",
+            //   lg: "inline",
+            // }}
+            w="full"
+            bgClip="text"
+            bgGradient="linear(to-l, #635bff, #7a73ff)"
+            fontWeight="extrabold"
+          >
+            Stripe Invoices
+          </Text>{" "}
+          <Text display={"inline-flex"}>
+            with{" "}
+            <HStack pl={3} display="inline-flex">
+              <USDC size={44} />
+              <Text>USDC.</Text>
+            </HStack>
+          </Text>
+        </chakra.h1>
+
+        <Text mb={4} fontSize="lg">
+          Lizard Pay is built on top of Stripe to enable crypto payments on your
+          invoices.
+        </Text>
+
+        <Stack
+          direction={{
+            base: "column",
+            sm: "row",
+          }}
+          mb={{
+            base: 4,
+            md: 8,
+          }}
+          spacing={2}
+          justifyContent={{
+            sm: "left",
+            md: "center",
+          }}
+        >
+          <ConnectStripe />
+        </Stack>
+      </Box>
+      <Box
+        w={{
+          base: "full",
+          md: 10 / 12,
+        }}
+        mx="auto"
+        mt={20}
+        textAlign="center"
+      >
+        <Image
+          w="full"
+          rounded="lg"
+          shadow="2xl"
+          src="./invoice.png"
+          alt="Hellonext feedback boards software screenshot"
+        />
+      </Box>
+    </Box>
   );
 };
 

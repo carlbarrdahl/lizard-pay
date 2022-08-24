@@ -8,6 +8,7 @@ const STRIPE_CONNECT = `https://connect.stripe.com/oauth/authorize?response_type
 const ConnectStripe = () => (
   <Link href={STRIPE_CONNECT} passHref>
     <Button
+      size="lg"
       color="white"
       bg="#635bff"
       fontWeight={"normal"}
