@@ -7,6 +7,7 @@ import { EthAddress, InvoiceId, StripeAccount } from "schemas";
 import { NextApiRequest } from "next";
 import { verifyJwt } from "utils/jwt";
 import { supabase } from "utils/supabase";
+import { getTransactions } from "utils/alchemy";
 
 export const appRouter = trpc
   .router<Context>()
@@ -73,6 +74,27 @@ export const appRouter = trpc
     input: z.object({ id: InvoiceId }),
     async resolve({ input: { id } }) {
       return stripe.invoices.pay(id, { paid_out_of_band: true });
+    },
+  })
+  .query("tx.list", {
+    input: z.object({
+      address: EthAddress,
+      network: z.number(),
+    }),
+    async resolve({ input: { address, network } }) {
+      return getTransactions(
+        {
+          fromBlock: "0x0",
+          toBlock: "latest",
+          category: ["erc20"],
+          withMetadata: true,
+          excludeZeroValue: false,
+          order: "desc",
+          maxCount: "0x3e8",
+          toAddress: address,
+        },
+        { network }
+      ).then((r) => r.result.transfers || []);
     },
   });
 

@@ -3,10 +3,16 @@ import {
   Button,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Heading,
   HStack,
   Input,
+  InputGroup,
+  InputRightElement,
+  Skeleton,
+  SkeletonText,
+  Text,
 } from "@chakra-ui/react";
 import Layout, { useStripe } from "components/Layout";
 import ConnectStripe from "features/dashboard/components/ConnectStripe";
@@ -28,42 +34,8 @@ import { setToken } from "utils/localStorage";
 import { trpc } from "utils/trpc";
 import Card from "components/Card";
 import InvoicesTable from "features/dashboard/components/InvoicesTable";
-
-function AddressForm({ address = "" }) {
-  const wallet = trpc.useMutation("customer.wallet");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(z.object({ address: EthAddress })),
-    defaultValues: { address },
-  });
-
-  const error = errors.address;
-  return (
-    <form
-      onSubmit={handleSubmit(({ address }) => {
-        console.log(address);
-        wallet.mutate({ address });
-      })}
-    >
-      <FormControl isInvalid={!!error} mb={2}>
-        <FormLabel htmlFor="address">Wallet Address</FormLabel>
-        <Input required id="address" {...register("address")} />
-        <FormErrorMessage>{error?.message}</FormErrorMessage>
-      </FormControl>
-      <Button
-        type="submit"
-        colorScheme={"blue"}
-        isLoading={wallet.isLoading}
-        disabled={wallet.isLoading}
-      >
-        Save
-      </Button>
-    </form>
-  );
-}
+import TransactionsTable from "features/dashboard/components/TransactionTable";
+import WalletForm from "features/dashboard/components/WalletForm";
 
 const Dashboard: NextPage = () => {
   const { data, isLoading, error } = trpc.useQuery(["customer.me"]);
@@ -71,14 +43,26 @@ const Dashboard: NextPage = () => {
   return (
     <Layout>
       <Box>
-        <Heading>{data?.account?.settings?.dashboard.display_name}</Heading>
-        <Card>
-          {data && !isLoading ? <AddressForm address={data?.wallet} /> : null}
-        </Card>
+        <Box mb={12} maxW="container.sm">
+          <Heading size="lg" mb={4}>
+            {data?.account?.settings?.dashboard.display_name || "-"}
+          </Heading>
+          <WalletForm isLoading={isLoading} address={data?.wallet} />
+        </Box>
 
-        <Card>
+        <Box mb={12}>
+          <Heading size="sm">Invoices</Heading>
           <InvoicesTable account={data?.account.id} />
-        </Card>
+        </Box>
+        <Box mb={12}>
+          <HStack>
+            <Heading size="sm">Transactions to:</Heading>
+            <Text as="pre" fontSize={"xs"}>
+              {data?.wallet}
+            </Text>
+          </HStack>
+          <TransactionsTable address={data?.wallet} />
+        </Box>
       </Box>
     </Layout>
   );

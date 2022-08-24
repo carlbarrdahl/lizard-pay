@@ -76,7 +76,7 @@ export default function InvoicesTable({ account = "" }) {
                 {invoice.due_date && formatDate(invoice.due_date * 1000)}
               </Td>
               <Td isNumeric>{formatDate(invoice.created * 1000)}</Td>
-              <Td>
+              <Td isNumeric>
                 <ButtonGroup>
                   {invoice.status === "open" ? (
                     <Link href={`/i/${account}/${invoice.id}/pay`} passHref>
