@@ -41,28 +41,13 @@ const Home: NextPage<{ token: string }> = ({ token, ...props }) => {
       >
         <chakra.h1
           mb={6}
-          fontSize="6xl"
-          // fontSize={{
-          //   base: "4xl",
-          //   md: "6xl",
-          // }}
+          fontSize="5xl"
           fontWeight="bold"
           lineHeight="none"
-          // letterSpacing={{
-          //   base: "normal",
-          //   md: "tight",
-          // }}
           color="gray.900"
-          // _dark={{
-          //   color: "gray.100",
-          // }}
         >
           Receive payments for your
           <Text
-            // display={{
-            //   base: "block",
-            //   lg: "inline",
-            // }}
             w="full"
             bgClip="text"
             bgGradient="linear(to-l, #635bff, #7a73ff)"
@@ -89,10 +74,6 @@ const Home: NextPage<{ token: string }> = ({ token, ...props }) => {
             base: "column",
             sm: "row",
           }}
-          mb={{
-            base: 4,
-            md: 8,
-          }}
           spacing={2}
           justifyContent={{
             sm: "left",
@@ -108,7 +89,7 @@ const Home: NextPage<{ token: string }> = ({ token, ...props }) => {
           md: 10 / 12,
         }}
         mx="auto"
-        mt={20}
+        mt={8}
         textAlign="center"
       >
         <Image
