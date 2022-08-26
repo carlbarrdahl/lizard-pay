@@ -10,6 +10,7 @@ import {
   Tr,
   Td,
   Textarea,
+  HStack,
 } from "@chakra-ui/react";
 
 import { formatMoney } from "utils/formatMoney";
@@ -18,6 +19,7 @@ import Card from "components/Card";
 import { truncate } from "utils/truncate";
 import { useAccount, useNetwork } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import USDC from "components/USDC";
 
 function PayButton({ amount = 0, disabled = false, isLoading = false }) {
   const { address } = useAccount();
@@ -69,7 +71,13 @@ export default function PayInvoice({ address = "", amount = 0 }) {
           <Tr>
             <Td>Amount</Td>
             <Td>
-              {amount} {usdc.data?.symbol}
+              <HStack>
+                <USDC size={12} />
+                <Text>
+                  {usdc.data?.symbol}
+                  {amount}
+                </Text>
+              </HStack>
             </Td>
           </Tr>
           <Tr>

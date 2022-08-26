@@ -43,7 +43,7 @@ const Home: NextPage<{ token: string }> = ({ token, ...props }) => {
           mb={6}
           fontSize="5xl"
           fontWeight="bold"
-          lineHeight="none"
+          lineHeight={"none"}
           color="gray.900"
         >
           Receive payments for your
@@ -57,16 +57,16 @@ const Home: NextPage<{ token: string }> = ({ token, ...props }) => {
           </Text>{" "}
           <Text display={"inline-flex"}>
             with{" "}
-            <HStack pl={3} display="inline-flex">
+            <HStack pl={3} display="inline-flex" as="span">
               <USDC size={44} />
-              <Text>USDC.</Text>
+              <Text as="span">USDC.</Text>
             </HStack>
           </Text>
         </chakra.h1>
 
         <Text mb={4} fontSize="lg">
-          Lizard Pay is built on top of Stripe to enable crypto payments on your
-          invoices.
+          Built on top of Stripe to enable crypto payments to your invoices. Map
+          your wallet transactions to your Stripe invoices.
         </Text>
 
         <Stack
