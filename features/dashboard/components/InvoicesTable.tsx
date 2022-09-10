@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Select,
   Skeleton,
   SkeletonText,
   Table,
@@ -18,6 +19,7 @@ import {
 import Link from "next/link";
 import { formatDate } from "utils/formatDate";
 import { formatMoney } from "utils/formatMoney";
+import { truncate } from "utils/truncate";
 import { trpc } from "utils/trpc";
 
 function ErrorMessage({ title = "", error }) {
@@ -40,8 +42,11 @@ function ErrorMessage({ title = "", error }) {
   ) : null;
 }
 
-export default function InvoicesTable({ account = "" }) {
+export default function InvoicesTable({ address = "", account = "" }) {
   const { data, isLoading, error, ...rest } = trpc.useQuery(["invoices.list"]);
+  const tx = trpc.useQuery(["tx.list", { address, network: 1 }], {
+    enabled: Boolean(address),
+  });
   console.log("error", error, rest);
   return (
     <Box>
@@ -53,8 +58,9 @@ export default function InvoicesTable({ account = "" }) {
             <Th>Customer</Th>
             <Th>Status</Th>
             <Th isNumeric>Amount</Th>
-            <Th isNumeric>Due</Th>
             <Th isNumeric>Created</Th>
+            <Th isNumeric>Due</Th>
+            <Th isNumeric>Matching Transaction</Th>
             <Th isNumeric></Th>
           </Tr>
         </Thead>
@@ -71,11 +77,21 @@ export default function InvoicesTable({ account = "" }) {
               <Td>{invoice.number}</Td>
               <Td>{invoice.customer_name}</Td>
               <Td>{invoice.status}</Td>
-              <Td>{formatMoney(invoice.total / 100)}</Td>
+              <Td>{formatMoney(invoice.amount_due / 100)}</Td>
+              <Td isNumeric>{formatDate(invoice.created * 1000)}</Td>
               <Td isNumeric>
                 {invoice.due_date && formatDate(invoice.due_date * 1000)}
               </Td>
-              <Td isNumeric>{formatDate(invoice.created * 1000)}</Td>
+              <Td>
+                {invoice.status === "paid" && (
+                  <Select>
+                    <option>Select transaction</option>
+                    {tx.data?.map((t) => (
+                      <option key={t.hash}>{truncate(t.hash)}</option>
+                    ))}
+                  </Select>
+                )}
+              </Td>
               <Td isNumeric>
                 <ButtonGroup>
                   {invoice.status === "open" ? (
@@ -94,3 +110,13 @@ export default function InvoicesTable({ account = "" }) {
     </Box>
   );
 }
+
+const SelectTx = ({ tx = [] }) => {
+  return (
+    <Select>
+      {tx.map((tx) => (
+        <option key={tx.hash}>{truncate(tx.hash)}</option>
+      ))}
+    </Select>
+  );
+};

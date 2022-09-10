@@ -8,6 +8,7 @@ import { NextApiRequest } from "next";
 import { verifyJwt } from "utils/jwt";
 import { supabase } from "utils/supabase";
 import { getTransactions } from "utils/alchemy";
+import { invoices, tx } from "__test__/data";
 
 export const appRouter = trpc
   .router<Context>()
@@ -25,6 +26,7 @@ export const appRouter = trpc
         return {
           account: await stripe.accounts.retrieve(stripe_user_id),
           wallet,
+          // wallet: "0xD5c94d0BfCa611E3BF62228E85FC5374c4dEB4c9",
         };
       }
       return null;
@@ -57,6 +59,7 @@ export const appRouter = trpc
     input: z.any(),
     async resolve({ input, ctx }) {
       if (ctx.user) {
+        // return invoices;
         return stripe.invoices.list({ stripeAccount: ctx.user.stripe_user_id });
       }
       return null;
@@ -82,6 +85,7 @@ export const appRouter = trpc
       network: z.number(),
     }),
     async resolve({ input: { address, network } }) {
+      // return tx;
       return getTransactions(
         {
           fromBlock: "0x0",

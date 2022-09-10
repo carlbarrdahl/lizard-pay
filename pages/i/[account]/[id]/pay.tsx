@@ -38,7 +38,8 @@ const PayInvoicePage: NextPage = () => {
   const walletAddress = trpc.useQuery(["account.wallet", { account }]);
   console.log(invoice);
   console.log(walletAddress.data);
-  const wallet = getAddress(invoice?.footer) || walletAddress.data?.wallet;
+  const wallet = walletAddress.data?.wallet;
+  // const wallet = getAddress(invoice?.footer) || walletAddress.data?.wallet;
   const { chain } = useNetwork();
   const isTest = true || chain?.id !== 1;
   const isCorrectChain =

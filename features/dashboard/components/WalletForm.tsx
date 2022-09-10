@@ -26,7 +26,7 @@ export default function WalletForm({ address = "", isLoading }) {
     formState: { errors },
     reset,
   } = useForm({
-    resolver: zodResolver(z.object({ address: EthAddress })),
+    // resolver: zodResolver(z.object({ address: EthAddress })),
     defaultValues: { address },
   });
 
@@ -66,7 +66,7 @@ export default function WalletForm({ address = "", isLoading }) {
             invoices to be sent.
           </FormHelperText>
           <InputGroup>
-            <Input required id="address" {...register("address")} />
+            <Input id="address" {...register("address")} />
             <InputRightElement
               as={Button}
               type="submit"
